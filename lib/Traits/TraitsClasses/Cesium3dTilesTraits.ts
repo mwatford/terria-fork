@@ -18,6 +18,11 @@ import SplitterTraits from "./SplitterTraits";
 import TransformationTraits from "./TransformationTraits";
 import UrlTraits from "./UrlTraits";
 import FeaturePickingTraits from "./FeaturePickingTraits";
+import ChartPointOnMapTraits from "./ChartPointOnMapTraits";
+import DiscretelyTimeVaryingTraits from "./DiscretelyTimeVaryingTraits";
+import ExportableTraits from "./ExportableTraits";
+import LayerOrderingTraits from "./LayerOrderingTraits";
+import TableTraits from "./Table/TableTraits";
 
 export class FilterTraits extends ModelTraits {
   @primitiveTrait({

@@ -454,12 +454,13 @@ function TableMixin<T extends AbstractConstructor<BaseType>>(Base: T) {
         {
           id: TableStylingWorkflow.type,
           name: "Edit Style",
-          onClick: action((viewState) =>
+          onClick: action((viewState) => {
+            console.log({ viewState });
             SelectableDimensionWorkflow.runWorkflow(
               viewState,
               new TableStylingWorkflow(this)
-            )
-          ),
+            );
+          }),
           icon: { glyph: Icon.GLYPHS.layers }
         }
       ]);
@@ -747,7 +748,10 @@ function TableMixin<T extends AbstractConstructor<BaseType>>(Base: T) {
         // region mapped tables.
         await this.loadRegionProviderList();
 
-        if (dataColumnMajor !== undefined && dataColumnMajor !== null) {
+        if (
+          isDefined(dataColumnMajor) !== undefined &&
+          dataColumnMajor !== null
+        ) {
           runInAction(() => {
             this.dataColumnMajor = dataColumnMajor;
           });

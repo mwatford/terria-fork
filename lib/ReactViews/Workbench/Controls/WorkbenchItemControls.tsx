@@ -86,7 +86,7 @@ const WorkbenchItemControls: React.FC<WorkbenchItemControlsProps> = observer(
     // Apply controls from props on top of defaultControls
     const controls = { ...defaultControls, ...controlsWithoutDefaults };
     const { generatedControls, error } = generateControls(viewState, item);
-
+    console.log({ controls });
     if (error) {
       error.log();
     }

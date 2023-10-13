@@ -359,6 +359,7 @@ class ViewingControls extends React.Component<
     );
     // Item specific viewing controls
     const itemViewingControls: ViewingControl[] = item.viewingControls;
+    console.log({ itemViewingControls });
 
     // Collate list, unique by id and sorted by name
     const viewingControls = sortBy(

@@ -164,7 +164,7 @@ export default class TableStylingWorkflow
                 } catch (e) {
                   TerriaError.from(e).raiseError(
                     this.item.terria,
-                    "Failed to copy to clipboard. User stratum has been printed to console"
+                    "Failed to copy to clipboard. User  stratum has been printed to console"
                   );
                   console.log(stratum);
                 }

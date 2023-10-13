@@ -52,7 +52,6 @@ interface ViewStateOptions {
   locationSearchProviders: any[];
   errorHandlingProvider?: any;
 }
-
 /**
  * Root of a global view model. Presumably this should get nested as more stuff goes into it. Basically this belongs to
  * the root of the UI and then it can choose to pass either the whole thing or parts down as props to its children.

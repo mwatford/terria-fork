@@ -81,6 +81,7 @@
     "@visx/shape": "^2.1.0",
     "@visx/tooltip": "^2.1.0",
     "assimpjs": "^0.0.7",
+    "axios": "^1.5.0",
     "babel-loader": "^8.2.3",
     "babel-plugin-jsx-control-statements": "^4.0.0",
     "babel-plugin-lodash": "^3.3.4",

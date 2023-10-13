@@ -3,15 +3,14 @@ import {
   action,
   computed,
   isObservableArray,
-  observable,
-  runInAction,
-  toJS,
   makeObservable,
-  override
+  observable,
+  override,
+  runInAction,
+  toJS
 } from "mobx";
 import Cartesian2 from "terriajs-cesium/Source/Core/Cartesian2";
 import Cartesian3 from "terriajs-cesium/Source/Core/Cartesian3";
-import clone from "terriajs-cesium/Source/Core/clone";
 import Color from "terriajs-cesium/Source/Core/Color";
 import HeadingPitchRoll from "terriajs-cesium/Source/Core/HeadingPitchRoll";
 import IonResource from "terriajs-cesium/Source/Core/IonResource";
@@ -20,23 +19,28 @@ import Matrix4 from "terriajs-cesium/Source/Core/Matrix4";
 import Quaternion from "terriajs-cesium/Source/Core/Quaternion";
 import Resource from "terriajs-cesium/Source/Core/Resource";
 import Transforms from "terriajs-cesium/Source/Core/Transforms";
+import clone from "terriajs-cesium/Source/Core/clone";
 import Cesium3DTileColorBlendMode from "terriajs-cesium/Source/Scene/Cesium3DTileColorBlendMode";
 import Cesium3DTileFeature from "terriajs-cesium/Source/Scene/Cesium3DTileFeature";
 import Cesium3DTilePointFeature from "terriajs-cesium/Source/Scene/Cesium3DTilePointFeature";
-import Cesium3DTileset from "terriajs-cesium/Source/Scene/Cesium3DTileset";
 import Cesium3DTileStyle from "terriajs-cesium/Source/Scene/Cesium3DTileStyle";
+import Cesium3DTileset from "terriajs-cesium/Source/Scene/Cesium3DTileset";
 import AbstractConstructor from "../Core/AbstractConstructor";
-import isDefined from "../Core/isDefined";
-import { isJsonObject, JsonObject } from "../Core/Json";
-import runLater from "../Core/runLater";
+import { JsonObject, isJsonObject } from "../Core/Json";
 import TerriaError from "../Core/TerriaError";
+import filterOutUndefined from "../Core/filterOutUndefined";
+import isDefined from "../Core/isDefined";
+import runLater from "../Core/runLater";
 import proxyCatalogItemUrl from "../Models/Catalog/proxyCatalogItemUrl";
 import CommonStrata from "../Models/Definition/CommonStrata";
-import createStratumInstance from "../Models/Definition/createStratumInstance";
 import LoadableStratum from "../Models/Definition/LoadableStratum";
 import Model, { BaseModel } from "../Models/Definition/Model";
 import StratumOrder from "../Models/Definition/StratumOrder";
+import createStratumInstance from "../Models/Definition/createStratumInstance";
 import TerriaFeature from "../Models/Feature/Feature";
+import { ViewingControl } from "../Models/ViewingControls";
+import TableStylingWorkflow from "../Models/Workflows/TableStylingWorkflow";
+import Icon from "../Styled/Icon";
 import Cesium3DTilesCatalogItemTraits from "../Traits/TraitsClasses/Cesium3DTilesCatalogItemTraits";
 import Cesium3dTilesTraits, {
   OptionsTraits
@@ -45,6 +49,8 @@ import CatalogMemberMixin, { getName } from "./CatalogMemberMixin";
 import ClippingMixin from "./ClippingMixin";
 import MappableMixin from "./MappableMixin";
 import ShadowMixin from "./ShadowMixin";
+import * as SelectableDimensionWorkflow from "../Models/Workflows/SelectableDimensionWorkflow";
+import Cesium3DTilesStylingWorkflow from "../Models/Workflows/Cesium3DTilesStylingWorkflow";
 
 class Cesium3dTilesStratum extends LoadableStratum(Cesium3dTilesTraits) {
   constructor(...args: any[]) {
@@ -157,7 +163,7 @@ function Cesium3dTilesMixin<T extends AbstractConstructor<BaseType>>(Base: T) {
     }
 
     private loadTileset() {
-      if (!isDefined(this.url) && !isDefined(this.ionAssetId)) {
+      if (!isDefined(this?.url) && !isDefined(this.ionAssetId)) {
         throw `\`url\` and \`ionAssetId\` are not defined for ${getName(this)}`;
       }
 
@@ -262,6 +268,39 @@ function Cesium3dTilesMixin<T extends AbstractConstructor<BaseType>>(Base: T) {
           this.originalRootTransform
         );
       return modelMatrixFromTraits;
+    }
+
+    @override
+    get viewingControls(): ViewingControl[] {
+      return filterOutUndefined([
+        ...super.viewingControls,
+        {
+          id: TableStylingWorkflow.type,
+          name: "Edit Style",
+          onClick: (viewState) => {
+            if (this.tileset) {
+              this.tileset.pointCloudShading.attenuation = true;
+              this.tileset.pointCloudShading.geometricErrorScale = 5;
+              // asd(this.tileset)
+              // console.log(asdqwe)
+              console.log({ url: this.tileset?.root.content.url });
+              this.tileset.style = new Cesium3DTileStyle({
+                color: {
+                  conditions: [
+                    ["${CLASSIFICATION} === 2", "color('#fac')"],
+                    ["true", "color('white', 1)"]
+                  ]
+                }
+              });
+            }
+            SelectableDimensionWorkflow.runWorkflow(
+              viewState,
+              new Cesium3DTilesStylingWorkflow(this)
+            );
+          },
+          icon: { glyph: Icon.GLYPHS.layers }
+        }
+      ]);
     }
 
     @computed
@@ -667,3 +706,35 @@ function normalizeColorExpression(expr: any): {
   if (isJsonObject(expr)) Object.assign(normalized, expr);
   return normalized;
 }
+let asdqwe = false;
+// function asd(qwe: any, dupa: any[] = []) {
+//   console.log({ qwe })
+//   if (!dupa.includes(qwe)) {
+//     if ('terria' in qwe) asdqwe = true
+//     for (const [key, value] of Object.entries(qwe)) {
+//       if (key === 'terria' || value === "terria") asdqwe = true
+//       else if (typeof value === 'object') {
+//         dupa.push(value)
+//         asd(value, dupa)
+//       }
+//     }
+//   }
+//   return 'dupa'
+// }
+
+const asd = (a: any, b: any[] = []) => {
+  if (!b.includes(a)) {
+    if (typeof a === "object") {
+      b.push(a);
+      if ("terria" in a) asdqwe = true;
+    }
+    return Object.entries(a).forEach(([k, v]) => {
+      if (v === "terria") asdqwe = true;
+      if (typeof v === "object") {
+        asd(v, b);
+      }
+      return v;
+    });
+  }
+  return "dalej";
+};
